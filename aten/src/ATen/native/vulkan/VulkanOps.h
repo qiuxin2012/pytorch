@@ -47,6 +47,8 @@ void max_pool2d(
     const int dilationH,
     const int dilationW);
 
+VulkanTensor transpose(const VulkanTensor& input, int64_t dim0, int64_t dim1);
+
 VulkanTensor reshape_copy(
     const VulkanTensor& input,
     std::vector<int64_t> shape);
