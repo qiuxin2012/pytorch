@@ -30,7 +30,8 @@ class _NormBase(Module):
         eps: float = 1e-5,
         momentum: float = 0.1,
         affine: bool = True,
-        track_running_stats: bool = True
+        track_running_stats: bool = True,
+        freezed: bool = False
     ) -> None:
         super(_NormBase, self).__init__()
         self.num_features = num_features
@@ -38,9 +39,14 @@ class _NormBase(Module):
         self.momentum = momentum
         self.affine = affine
         self.track_running_stats = track_running_stats
+        self.freezed = freezed
         if self.affine:
-            self.weight = Parameter(torch.Tensor(num_features))
-            self.bias = Parameter(torch.Tensor(num_features))
+            if self.freezed:
+                self.register_buffer('weight', torch.Tensor(num_features))
+                self.register_buffer('bias', torch.Tensor(num_features))
+            else:    
+                self.weight = Parameter(torch.Tensor(num_features))
+                self.bias = Parameter(torch.Tensor(num_features))
         else:
             self.register_parameter('weight', None)
             self.register_parameter('bias', None)
@@ -92,11 +98,12 @@ class _NormBase(Module):
 class _BatchNorm(_NormBase):
 
     def __init__(self, num_features, eps=1e-5, momentum=0.1, affine=True,
-                 track_running_stats=True):
+                 track_running_stats=True, freezed=False):
         super(_BatchNorm, self).__init__(
-            num_features, eps, momentum, affine, track_running_stats)
+            num_features, eps, momentum, affine, track_running_stats, freezed)
 
     def forward(self, input: Tensor) -> Tensor:
+        self.training=bool(1-freezed)
         self._check_input_dim(input)
 
         # exponential_average_factor is set to self.momentum
