@@ -103,7 +103,7 @@ class _BatchNorm(_NormBase):
             num_features, eps, momentum, affine, track_running_stats, freezed)
 
     def forward(self, input: Tensor) -> Tensor:
-        self.training=bool(1-freezed)
+        self.training=bool(1-self.freezed)
         self._check_input_dim(input)
 
         # exponential_average_factor is set to self.momentum
